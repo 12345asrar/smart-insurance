@@ -1,0 +1,236 @@
+// Prisma Schema for Smart Insurance & Financial System
+// المنظومة المتكاملة للتأمينات والحسابات المالية
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// 1. القطاع التأميني: المنشآت والمشتركون
+// ==========================================
+
+model Establishment {
+  id               String   @id @default(uuid())
+  registrationNo   String   @unique // رقم الاشتراك التأميني للمنشأة
+  name             String   // اسم المنشأة / الشركة
+  commercialRegNo  String?  // السجل التجاري
+  taxNumber        String?  // الرقم الضريبي
+  phone            String
+  email            String?
+  address          String?
+  status           String   @default("ACTIVE") // ACTIVE, SUSPENDED, CLOSED
+  currentBalance   Decimal  @default(0.0) @db.Decimal(15, 2) // رصيد المنشأة (مدين / دائن)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // العلاقات
+  workers          EmploymentRecord[]
+  invoices         InsuranceInvoice[]
+  wageDeclarations WageDeclaration[]
+  movements        WorkerMovement[]
+
+  @@map("establishments")
+}
+
+model InsuredMember {
+  id               String   @id @default(uuid())
+  nationalId       String   @unique // الرقم الوطني / الهوية
+  insuranceNo      String   @unique // الرقم التأميني الموحد للعامل
+  fullName         String   // الاسم الرباعي
+  gender           String   // MALE, FEMALE
+  birthDate        DateTime
+  maritalStatus    String   // SINGLE, MARRIED, WIDOWED, DIVORCED
+  bankIban         String?  // رقم الآيبان البنكي / المحفظة لصرف التعويضات
+  phone            String
+  status           String   @default("ACTIVE") // ACTIVE, INACTIVE, RETIRED
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // العلاقات
+  employments      EmploymentRecord[]
+  claims           BenefitClaim[]
+  movements        WorkerMovement[]
+
+  @@map("insured_members")
+}
+
+// سجل عمل العامل وتاريخ الأجر
+model EmploymentRecord {
+  id               String        @id @default(uuid())
+  establishmentId  String
+  insuredMemberId  String
+  jobTitle         String        // المسمى الوظيفي
+  basicSalary      Decimal       @db.Decimal(12, 2) // الأجر الأساسي
+  allowances       Decimal       @default(0.0) @db.Decimal(12, 2) // البدلات الخاضعة
+  totalSalary      Decimal       @db.Decimal(12, 2) // إجمالي الأجر التأميني
+  startDate        DateTime      // تاريخ بدء العمل والاشتراك
+  endDate          DateTime?     // تاريخ انتهاء الخدمة (في حال الاستبعاد)
+  status           String        @default("ACTIVE") // ACTIVE, TERMINATED, TRANSFERRED
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  establishment    Establishment @relation(fields: [establishmentId], references: [id])
+  insuredMember    InsuredMember @relation(fields: [insuredMemberId], references: [id])
+
+  @@map("employment_records")
+}
+
+// حركات العمالة (إدخال عمال / إخراج عمال / نقل)
+model WorkerMovement {
+  id               String        @id @default(uuid())
+  movementType     String        // REGISTER (إدخال), TERMINATE (استبعاد), SALARY_CHANGE (تعديل أجر)
+  establishmentId  String
+  insuredMemberId  String
+  effectiveDate    DateTime      // تاريخ سريان الحركة
+  reason           String?       // سبب إنهاء الخدمة مثلاً (استقالة، نهاية عقد، فسخ)
+  notes            String?
+  status           String        @default("APPROVED") // PENDING, APPROVED, REJECTED
+  createdBy        String?       // من أنشأ الطلب (المنشأة عبر البوابة أو موظف التأمينات)
+  createdAt        DateTime      @default(now())
+
+  establishment    Establishment @relation(fields: [establishmentId], references: [id])
+  insuredMember    InsuredMember @relation(fields: [insuredMemberId], references: [id])
+
+  @@map("worker_movements")
+}
+
+// إقرار الرواتب والأجور الشهرية
+model WageDeclaration {
+  id               String             @id @default(uuid())
+  establishmentId  String
+  year             Int
+  month            Int
+  totalWorkers     Int                // عدد العمال المصرح عنهم
+  totalWages       Decimal            @db.Decimal(15, 2) // إجمالي كشف الرواتب
+  employerShare    Decimal            @db.Decimal(15, 2) // حصة المنشأة (مثلاً 9% أو 11%)
+  employeeShare    Decimal            @db.Decimal(15, 2) // حصة العمال (مثلاً 6%)
+  totalAmount      Decimal            @db.Decimal(15, 2) // إجمالي الاشتراك المستحق
+  status           String             @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  createdAt        DateTime           @default(now())
+
+  establishment    Establishment      @relation(fields: [establishmentId], references: [id])
+  invoice          InsuranceInvoice?
+
+  @@unique([establishmentId, year, month])
+  @@map("wage_declarations")
+}
+
+// فواتير الاشتراكات التأمينية المطلوب سدادها
+model InsuranceInvoice {
+  id                 String           @id @default(uuid())
+  invoiceNo          String           @unique // رقم الفاتورة / سداد
+  establishmentId    String
+  wageDeclarationId  String?          @unique
+  month              Int
+  year               Int
+  amountDue          Decimal          @db.Decimal(15, 2) // المبلغ المستحق
+  amountPaid         Decimal          @default(0.0) @db.Decimal(15, 2) // المبلغ المسدد
+  dueDate            DateTime
+  status             String           @default("UNPAID") // UNPAID, PARTIAL, PAID
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  establishment      Establishment    @relation(fields: [establishmentId], references: [id])
+  wageDeclaration    WageDeclaration? @relation(fields: [wageDeclarationId], references: [id])
+  payments           PaymentTransaction[]
+
+  @@map("insurance_invoices")
+}
+
+// ==========================================
+// 2. قطاع المنافع والتعويضات (منح الزواج وغيرها)
+// ==========================================
+
+model BenefitClaim {
+  id                   String        @id @default(uuid())
+  claimNo              String        @unique // رقم معاملة التعويض
+  insuredMemberId      String
+  claimType            String        // MARRIAGE_GRANT (منحة زواج), LUMP_SUM (تعويض دفعة واحدة), DEATH_GRANT
+  eventDate            DateTime      // تاريخ عقد الزواج
+  documentNo           String?       // رقم عقد الزواج
+  documentUrl          String?       // رابط مرفق العقد
+  calculatedAmount     Decimal       @db.Decimal(12, 2) // المبلغ المستحق نظامياً
+  status               String        @default("SUBMITTED") // SUBMITTED, REVIEWED, APPROVED, DISBURSED, REJECTED
+  approvalNotes        String?
+  reviewedBy           String?       // الموظف المراجع
+  disbursedAt          DateTime?     // تاريخ الصرف الفعلي
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  insuredMember        InsuredMember @relation(fields: [insuredMemberId], references: [id])
+
+  @@map("benefit_claims")
+}
+
+// ==========================================
+// 3. القطاع المالي والمحاسبي (General Ledger)
+// ==========================================
+
+// شجرة الحسابات المحاسبية
+model Account {
+  id             String        @id @default(uuid())
+  accountCode    String        @unique // 1101, 1201, 4101, 5102
+  nameAr         String        // اسم الحساب بالعربية
+  accountType    String        // ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE
+  parentId       String?
+  isActive       Boolean       @default(true)
+  currentBalance Decimal       @default(0.0) @db.Decimal(15, 2)
+
+  parent         Account?      @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children       Account[]     @relation("AccountHierarchy")
+  journalLines   JournalLine[]
+
+  @@map("chart_of_accounts")
+}
+
+// القيود المحاسبية اليومية (تتولد تلقائياً مع كل حركة تأمينية)
+model JournalEntry {
+  id            String        @id @default(uuid())
+  entryNo       String        @unique // رقم القيد السنوي المتسلسل
+  date          DateTime      @default(now())
+  description   String        // شرح القيد وبيانه
+  referenceType String        // SOURCE: WAGE_DECLARATION, PAYMENT, MARRIAGE_GRANT
+  referenceId   String?       // رقم العملية المصدرية للتتبع العكسي
+  isPosted      Boolean       @default(true) // ترحيل مباشر
+  createdAt     DateTime      @default(now())
+
+  lines         JournalLine[]
+
+  @@map("journal_entries")
+}
+
+// سطور القيد المحاسبي (مدين ودائن متطابق)
+model JournalLine {
+  id             String       @id @default(uuid())
+  journalEntryId String
+  accountId      String
+  debit          Decimal      @default(0.0) @db.Decimal(15, 2) // مدين
+  credit         Decimal      @default(0.0) @db.Decimal(15, 2) // دائن
+  lineDescription String?
+
+  journalEntry   JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  account        Account      @relation(fields: [accountId], references: [id])
+
+  @@map("journal_lines")
+}
+
+// سجل عمليات السداد الإلكتروني
+model PaymentTransaction {
+  id             String           @id @default(uuid())
+  transactionNo  String           @unique // رقم العملية البنكية
+  invoiceId      String
+  amount         Decimal          @db.Decimal(15, 2)
+  paymentMethod  String           // E_WALLET, CREDIT_CARD, BANK_TRANSFER, CASH
+  gatewayRef     String?          // مرجع بوابة الدفع
+  status         String           @default("SUCCESS") // PENDING, SUCCESS, FAILED
+  paymentDate    DateTime         @default(now())
+
+  invoice        InsuranceInvoice @relation(fields: [invoiceId], references: [id])
+
+  @@map("payment_transactions")
+}
