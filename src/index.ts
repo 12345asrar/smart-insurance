@@ -164,6 +164,44 @@ app.post('/api/workers/terminate', async (req: Request, res: Response) => {
   }
 });
 
+// 5.1 حذف عامل نهائياً من قاعدة البيانات
+app.post('/api/workers/delete', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.body;
+    const emp = await prisma.employmentRecord.findUnique({ where: { id } });
+    if (emp) {
+      await prisma.benefitClaim.deleteMany({ where: { insuredMemberId: emp.insuredMemberId } });
+      await prisma.workerMovement.deleteMany({ where: { employmentRecordId: id } });
+      await prisma.employmentRecord.delete({ where: { id } });
+      await prisma.insuredMember.delete({ where: { id: emp.insuredMemberId } });
+    }
+    res.json({ success: true, message: 'تم حذف العامل نهائياً من قاعدة البيانات' });
+  } catch (error: any) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+// 5.2 تعديل بيانات وشعار منشأة الزبون
+app.post('/api/establishment/update', async (req: Request, res: Response) => {
+  try {
+    const { name, regNo, phone } = req.body;
+    let est = await prisma.establishment.findFirst();
+    if (est) {
+      est = await prisma.establishment.update({
+        where: { id: est.id },
+        data: {
+          name: name || est.name,
+          registrationNo: regNo || est.registrationNo,
+          phone: phone || est.phone,
+        },
+      });
+    }
+    res.json({ success: true, establishment: est });
+  } catch (error: any) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 // 6. إقرار الرواتب وتوليد القيد الآلي
 app.post('/api/wages/declare', async (req: Request, res: Response) => {
   try {
