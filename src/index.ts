@@ -21,6 +21,11 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.static('C:/Users/pc/.gemini/antigravity/scratch/smart-insurance-system/frontend'));
 app.use(express.static(path.join(process.cwd(), '../frontend')));
 
+// توجيه الرابط الرئيسي مباشرة إلى بوابة المشتركين
+app.get('/', (req: Request, res: Response) => {
+  res.redirect('/portal.html');
+});
+
 // 1. فحص الاتصال
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({
