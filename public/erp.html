@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>النظام المركزي الداخلي للتأمينات والمالية (Core ERP)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Tajawal', sans-serif; background-color: #0f172a; color: #f8fafc; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-xl shadow">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-black">النظام التأميني والمالي الداخلي المركزي</h1>
+            <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] px-2 py-0.5 rounded font-mono font-bold">INTERNAL ERP</span>
+          </div>
+          <p class="text-xs text-slate-400">لوحة الاعتماد والرقابة المالية للموظفين والمحاسبين فقط</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-xs bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-300 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-emerald-400 font-bold">سحابي مباشر 24/7</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
+
+    <!-- شريط الرقابة المالية -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-md flex flex-wrap items-center justify-between gap-6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          المحرك المالي الآلي يستقبل الحركات من الهاتف
+        </div>
+        <h2 class="text-xl font-black">ميزان الرقابة والمطابقة المالية المركزية</h2>
+        <p class="text-xs text-slate-400 mt-1">توليد القيود المحاسبية وترحيلها لحظياً دون أي تدخل بشري</p>
+      </div>
+
+      <div class="flex items-center gap-6 bg-slate-950/80 px-6 py-4 rounded-2xl border border-slate-800 font-mono">
+        <div>
+          <p class="text-[11px] text-slate-400 font-tajawal font-bold">إجمالي المدين:</p>
+          <p id="erp-debit" class="text-emerald-400 font-black text-lg mt-0.5">0 ر.ي</p>
+        </div>
+        <div class="w-px h-8 bg-slate-800"></div>
+        <div>
+          <p class="text-[11px] text-slate-400 font-tajawal font-bold">إجمالي الدائن:</p>
+          <p id="erp-credit" class="text-sky-400 font-black text-lg mt-0.5">0 ر.ي</p>
+        </div>
+        <div class="w-px h-8 bg-slate-800"></div>
+        <div>
+          <p class="text-[11px] text-slate-400 font-tajawal font-bold">حالة الدفاتر:</p>
+          <span class="text-xs font-bold text-emerald-400 font-tajawal">متطابق 100%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- التبويبات -->
+    <div class="flex border-b border-slate-800 text-sm font-bold gap-6">
+      <button onclick="switchTab('claims')" id="tab-btn-claims" class="pb-3 text-sky-400 border-b-2 border-sky-500 font-black">
+        <i class="fa-solid fa-stamp ml-1.5"></i> 1. طلبات منح الزواج الواردة من الهاتف
+      </button>
+      <button onclick="switchTab('ledger')" id="tab-btn-ledger" class="pb-3 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-book-journal-whills ml-1.5"></i> 2. دفتر اليومية العامة (القيود الآلية)
+      </button>
+    </div>
+
+    <!-- 1. شاشة الاعتماد -->
+    <section id="erp-sec-claims" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm">
+      <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-800">
+        <div>
+          <h3 class="font-black text-white text-base">الطلبات المحالة من الهاتف للاعتماد والصرف</h3>
+          <p class="text-xs text-slate-400">بمجرد الضغط على "اعتماد وصرف"، ينزل قيد الصرف المحاسبي فوراً ويصرف المبلغ للمستفيد</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-right text-sm">
+          <thead class="bg-slate-950 text-slate-400 text-xs font-bold border-b border-slate-800">
+            <tr>
+              <th class="p-3">رقم المعاملة</th>
+              <th class="p-3">المؤمن عليه</th>
+              <th class="p-3">وثيقة العقد</th>
+              <th class="p-3">مبلغ المنحة</th>
+              <th class="p-3">الحالة</th>
+              <th class="p-3 text-center">القرار المالي</th>
+            </tr>
+          </thead>
+          <tbody id="erp-claims-body" class="divide-y divide-slate-800"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2. دفتر اليومية -->
+    <section id="erp-sec-ledger" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm hidden">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
+        <div>
+          <h3 class="font-black text-white text-base">سجل القيود اليومية العامة في PostgreSQL</h3>
+          <p class="text-xs text-slate-400">كل حركة سداد أو إقرار تمت في الهاتف نزلت كقيد محاسبي مزدوج ومتزن هنا</p>
+        </div>
+      </div>
+      <div id="erp-journal-container" class="space-y-4"></div>
+    </section>
+
+  </div>
+
+  <script>
+    const API_BASE = '/api';
+
+    async function loadERP() {
+      try {
+        const [clRes, jRes, tbRes] = await Promise.all([
+          fetch(`${API_BASE}/claims`),
+          fetch(`${API_BASE}/accounting/journal-entries`),
+          fetch(`${API_BASE}/accounting/trial-balance`)
+        ]);
+
+        const cl = await clRes.json();
+        const j = await jRes.json();
+        const tb = await tbRes.json();
+
+        // 1. جدول الطلبات
+        const cBody = document.getElementById('erp-claims-body');
+        cBody.innerHTML = '';
+        if (!cl.data || cl.data.length === 0) {
+          cBody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">لا توجد طلبات منح زواج محالة من الهاتف حتى الآن.</td></tr>';
+        } else {
+          cl.data.forEach(c => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td class="p-3 font-mono font-bold text-sky-400 text-xs">${c.claimNo}</td>
+              <td class="p-3 font-bold">${c.workerName}</td>
+              <td class="p-3 font-mono text-xs text-slate-400">${c.doc}</td>
+              <td class="p-3 font-mono font-black text-rose-400">${Number(c.amount).toLocaleString()} ر.ي</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${c.status === 'SUBMITTED' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">${c.status === 'SUBMITTED' ? 'بانتظار الاعتماد' : 'تم الصرف الفعلي'}</span></td>
+              <td class="p-3 text-center">
+                ${c.status === 'SUBMITTED' ? `<button onclick="approveClaim('${c.id}')" class="bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-3.5 py-1.5 rounded-lg shadow transition">اعتماد وصرف فوري</button>` : '<span class="text-emerald-400 text-xs font-bold"><i class="fa-solid fa-check-double"></i> تم التحويل والقيد</span>'}
+              </td>
+            `;
+            cBody.appendChild(tr);
+          });
+        }
+
+        // 2. دفتر القيود
+        const jContainer = document.getElementById('erp-journal-container');
+        jContainer.innerHTML = '';
+        if (!j.data || j.data.length === 0) {
+          jContainer.innerHTML = '<div class="p-6 text-center text-slate-500 bg-slate-950/50 rounded-2xl border border-slate-800">لا توجد قيود مسجلة بعد.</div>';
+        } else {
+          j.data.forEach(entry => {
+            const card = document.createElement('div');
+            card.className = 'border border-slate-800 rounded-2xl p-4 bg-slate-950/60';
+            let lines = '';
+            entry.lines.forEach(l => {
+              lines += `
+                <div class="grid grid-cols-12 py-2 text-xs border-b border-slate-800/80 last:border-0 items-center">
+                  <span class="col-span-2 font-mono font-bold text-sky-400">${l.account.accountCode}</span>
+                  <span class="col-span-4 font-bold text-slate-200">${l.account.nameAr}</span>
+                  <span class="col-span-3 text-left font-mono font-bold ${Number(l.debit) > 0 ? 'text-emerald-400' : 'text-slate-600'}">${Number(l.debit) > 0 ? Number(l.debit).toLocaleString() : '-'}</span>
+                  <span class="col-span-3 text-left font-mono font-bold ${Number(l.credit) > 0 ? 'text-sky-400' : 'text-slate-600'}">${Number(l.credit) > 0 ? Number(l.credit).toLocaleString() : '-'}</span>
+                </div>
+              `;
+            });
+
+            card.innerHTML = `
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-xs">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold bg-slate-800 text-white px-2 py-0.5 rounded">${entry.entryNo}</span>
+                  <span class="font-bold text-white">${entry.description}</span>
+                </div>
+                <span class="text-slate-500 font-mono text-[11px]">${entry.date.split('T')[0]} | ${entry.referenceType}</span>
+              </div>
+              <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
+                ${lines}
+              </div>
+            `;
+            jContainer.appendChild(card);
+          });
+        }
+
+        // 3. التوازن
+        if (tb.success) {
+          document.getElementById('erp-debit').textContent = Number(tb.totalDebit).toLocaleString() + ' ر.ي';
+          document.getElementById('erp-credit').textContent = Number(tb.totalCredit).toLocaleString() + ' ر.ي';
+        }
+
+      } catch (e) {
+        console.error('ERP load error:', e);
+      }
+    }
+
+    async function approveClaim(id) {
+      try {
+        const res = await fetch(`${API_BASE}/claims/${id}/approve`, { method: 'POST' });
+        if (res.ok) {
+          alert('تم اعتماد وصرف منحة الزواج وتوليد قيد الصرف المحاسبي في قاعدة البيانات!');
+          await loadERP();
+        }
+      } catch (err) {
+        alert('حدث خطأ أثناء الاعتماد');
+      }
+    }
+
+    function switchTab(tab) {
+      ['claims', 'ledger'].forEach(t => {
+        document.getElementById(`erp-sec-${t}`).classList.add('hidden');
+        document.getElementById(`tab-btn-${t}`).className = 'pb-3 text-slate-400 hover:text-white font-medium';
+      });
+      document.getElementById(`erp-sec-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${tab}`).className = 'pb-3 text-sky-400 border-b-2 border-sky-500 font-black';
+    }
+
+    loadERP();
+    setInterval(loadERP, 2500); // تحديث فوري كل ثانيتين ونصف لملاحقة أي حركة من الهاتف!
+  </script>
+</body>
+</html>

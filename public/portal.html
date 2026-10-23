@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>بوابة الخدمات الإلكترونية للمشتركين</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; }
+    .mobile-tab-active { color: #0284c7 !important; font-weight: 800; }
+    .desktop-nav-active { background-color: #0284c7; color: white !important; font-weight: 700; }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col pb-20 lg:pb-6">
+
+  <!-- Header -->
+  <header class="bg-slate-900 text-white sticky top-0 z-40 border-b border-slate-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white text-lg shadow">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-black">بوابة المشتركين الذاتية</h1>
+          <p id="header-est-sub" class="text-[10px] text-sky-200">متصل بقاعدة البيانات السحابية</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 text-xs bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-emerald-400 font-bold text-[11px]">سحابي مباشر 24/7</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- القائمة الجانبية للكمبيوتر -->
+    <aside class="hidden lg:block lg:col-span-3 space-y-4">
+      <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
+        <h2 id="desktop-est-name" class="font-black text-slate-800 text-sm">شركة الصرح للتجارة</h2>
+        <p id="desktop-est-reg" class="text-xs text-slate-500 font-mono mt-0.5">EST-202601</p>
+        <div class="mt-3 text-xs flex justify-between">
+          <span class="text-slate-500">حالة السجل:</span>
+          <span class="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded">ساري ونشط</span>
+        </div>
+      </div>
+
+      <nav class="bg-white rounded-2xl p-2.5 border border-slate-200 shadow-sm space-y-1 text-sm font-medium">
+        <button onclick="switchTab('dash')" id="d-btn-dash" class="desktop-nav-active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-right">
+          <i class="fa-solid fa-chart-pie w-5"></i> <span>الرئيسية والرصيد</span>
+        </button>
+        <button onclick="switchTab('workers')" id="d-btn-workers" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-right">
+          <i class="fa-solid fa-users w-5"></i> <span>إدارة العمالة</span>
+        </button>
+        <button onclick="switchTab('wages')" id="d-btn-wages" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-right">
+          <i class="fa-solid fa-file-invoice-dollar w-5"></i> <span>إقرار الرواتب</span>
+        </button>
+        <button onclick="switchTab('pay')" id="d-btn-pay" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-right">
+          <i class="fa-solid fa-credit-card w-5"></i> <span>السداد الإلكتروني</span>
+        </button>
+        <button onclick="switchTab('marriage')" id="d-btn-marriage" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-right">
+          <i class="fa-solid fa-ring w-5"></i> <span>صرف منحة الزواج</span>
+        </button>
+      </nav>
+    </aside>
+
+    <main class="lg:col-span-9 space-y-4">
+
+      <!-- 1. الرئيسية -->
+      <section id="sec-dash" class="space-y-4">
+        <div class="bg-gradient-to-l from-slate-900 to-sky-950 text-white p-5 sm:p-7 rounded-2xl sm:rounded-3xl shadow-sm">
+          <div class="flex justify-between items-start gap-4">
+            <div>
+              <span class="text-[10px] bg-white/10 px-2.5 py-0.5 rounded-full font-bold text-sky-200">الاشتراكات التأمينية</span>
+              <p class="text-xs text-slate-300 mt-2">المبلغ المستحق للسداد:</p>
+              <h2 id="m-dash-due" class="text-2xl sm:text-4xl font-black text-amber-300 font-mono mt-0.5">0 ر.ي</h2>
+            </div>
+            <button onclick="switchTab('pay')" class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs py-2 px-3.5 rounded-xl shadow transition whitespace-nowrap mt-2">
+              <i class="fa-solid fa-bolt ml-1"></i> سداد الآن
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div onclick="switchTab('workers')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
+            <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg mb-2">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <p class="text-[11px] text-slate-500 font-bold">العمال المسجلون</p>
+            <h3 id="m-dash-workers" class="text-xl font-black text-slate-800 font-mono mt-0.5">0</h3>
+          </div>
+
+          <div onclick="switchTab('marriage')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm cursor-pointer active:scale-95 transition">
+            <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg mb-2">
+              <i class="fa-solid fa-ring"></i>
+            </div>
+            <p class="text-[11px] text-slate-500 font-bold">منح الزواج</p>
+            <h3 id="m-dash-claims" class="text-xl font-black text-slate-800 font-mono mt-0.5">0</h3>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+          <p class="text-xs font-bold text-slate-700">إجراءات سريعة:</p>
+          <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+            <button onclick="openModal('modal-add-w')" class="p-3 bg-sky-50 text-sky-700 rounded-xl text-right flex items-center gap-2">
+              <i class="fa-solid fa-user-plus text-sky-600"></i> تسجيل عامل
+            </button>
+            <button onclick="switchTab('wages')" class="p-3 bg-indigo-50 text-indigo-700 rounded-xl text-right flex items-center gap-2">
+              <i class="fa-solid fa-file-invoice text-indigo-600"></i> إقرار الرواتب
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. العمال -->
+      <section id="sec-workers" class="space-y-4 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm">
+          <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+            <div>
+              <h3 class="font-black text-slate-800 text-base">سجل العمال في قاعدة البيانات</h3>
+              <p class="text-[11px] text-slate-400">إضافة فورية واستبعاد</p>
+            </div>
+            <button onclick="openModal('modal-add-w')" class="bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs px-3 py-2 rounded-xl shadow transition flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> إضافة عامل
+            </button>
+          </div>
+          <div id="workers-cards-container" class="mt-3 space-y-2.5"></div>
+        </div>
+      </section>
+
+      <!-- 3. إقرار الرواتب -->
+      <section id="sec-wages" class="space-y-4 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm max-w-xl">
+          <h3 class="font-black text-slate-800 text-base mb-1">إقرار الرواتب الشهرية</h3>
+          <p class="text-xs text-slate-400 mb-4">احتساب آلي لحصة المنشأة (9%) وحصة العامل (6%)</p>
+
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80 space-y-2.5 text-xs">
+            <div class="flex justify-between"><span class="text-slate-500">العمال الخاضعون:</span><strong id="w-calc-cnt" class="font-mono text-slate-800">0</strong></div>
+            <div class="flex justify-between"><span class="text-slate-500">إجمالي الرواتب:</span><strong id="w-calc-sum" class="font-mono text-slate-800">0 ر.ي</strong></div>
+            <div class="flex justify-between text-emerald-700 font-bold border-t border-slate-200 pt-2 text-sm">
+              <span>المبلغ المستحق (15%):</span>
+              <span id="w-calc-due" class="font-mono text-base font-black">0 ر.ي</span>
+            </div>
+          </div>
+
+          <button onclick="submitWage()" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-3 rounded-xl shadow transition">
+            اعتماد الإقرار وإصدار الفاتورة وتوليد القيد المالي
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. السداد الإلكتروني -->
+      <section id="sec-pay" class="space-y-4 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm max-w-md">
+          <h3 class="font-black text-slate-800 text-base mb-1">السداد الإلكتروني الفوري</h3>
+          <p class="text-xs text-slate-400 mb-4">دفع الفاتورة وتصفير المديونية في قاعدة البيانات</p>
+
+          <div class="bg-slate-900 text-white p-5 rounded-2xl space-y-1 mb-4">
+            <p class="text-[11px] text-slate-400">إجمالي المطلوب سداده:</p>
+            <h2 id="pay-screen-amount" class="text-3xl font-black text-amber-300 font-mono">0 ر.ي</h2>
+          </div>
+
+          <button onclick="payNow()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs sm:text-sm shadow transition">
+            <i class="fa-solid fa-lock ml-1"></i> سداد الفاتورة الآن عن بعد
+          </button>
+        </div>
+      </section>
+
+      <!-- 5. منحة الزواج -->
+      <section id="sec-marriage" class="space-y-4 hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm max-w-md">
+          <h3 class="font-black text-slate-800 text-base mb-1">طلب صرف منحة الزواج</h3>
+          <p class="text-xs text-slate-400 mb-4">تصرف مباشرة للمؤمن عليه براتب شهرين</p>
+
+          <form onsubmit="applyGrant(event)" class="space-y-3 text-xs font-bold">
+            <div>
+              <label class="block text-slate-700 mb-1">اختر العامل</label>
+              <select id="mg-select" required class="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"></select>
+            </div>
+            <div>
+              <label class="block text-slate-700 mb-1">رقم وثيقة عقد الزواج</label>
+              <input id="mg-doc" required type="text" placeholder="مثال: م/2026/88" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-mono">
+            </div>
+            <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-xs shadow transition mt-2">
+              إرسال طلب المنحة للنظام الداخلي
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Bottom Navigation للهاتف -->
+  <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 px-2 py-2 flex justify-around items-center text-center shadow-lg">
+    <button onclick="switchTab('dash')" id="m-btn-dash" class="mobile-tab-active flex flex-col items-center gap-1 text-[10px] text-slate-500 py-1 px-2 transition">
+      <i class="fa-solid fa-chart-pie text-base"></i>
+      <span>الرئيسية</span>
+    </button>
+    <button onclick="switchTab('workers')" id="m-btn-workers" class="flex flex-col items-center gap-1 text-[10px] text-slate-500 py-1 px-2 transition">
+      <i class="fa-solid fa-users text-base"></i>
+      <span>العمال</span>
+    </button>
+    <button onclick="switchTab('wages')" id="m-btn-wages" class="flex flex-col items-center gap-1 text-[10px] text-slate-500 py-1 px-2 transition">
+      <i class="fa-solid fa-file-invoice text-base"></i>
+      <span>الرواتب</span>
+    </button>
+    <button onclick="switchTab('pay')" id="m-btn-pay" class="flex flex-col items-center gap-1 text-[10px] text-slate-500 py-1 px-2 transition">
+      <i class="fa-solid fa-credit-card text-base"></i>
+      <span>السداد</span>
+    </button>
+    <button onclick="switchTab('marriage')" id="m-btn-marriage" class="flex flex-col items-center gap-1 text-[10px] text-slate-500 py-1 px-2 transition">
+      <i class="fa-solid fa-ring text-base"></i>
+      <span>المنحة</span>
+    </button>
+  </nav>
+
+  <!-- Modal إضافة عامل -->
+  <div id="modal-add-w" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-slate-800 text-sm">تسجيل عامل جديد</h3>
+        <button onclick="closeModal('modal-add-w')" class="text-slate-400"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+      <form onsubmit="addWorker(event)" class="space-y-3 text-xs font-bold">
+        <div>
+          <label class="block text-slate-700 mb-1">اسم العامل الرباعي</label>
+          <input id="in-w-name" required type="text" placeholder="الاسم..." class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal">
+        </div>
+        <div>
+          <label class="block text-slate-700 mb-1">المسمى الوظيفي</label>
+          <input id="in-w-job" required type="text" placeholder="المسمى الوظيفي..." class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal">
+        </div>
+        <div>
+          <label class="block text-slate-700 mb-1">الأجر التأميني (ريال)</label>
+          <input id="in-w-salary" required type="number" step="5000" value="250000" class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal font-mono">
+        </div>
+        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white py-2.5 rounded-xl text-xs font-bold mt-2">تأكيد الحفظ في قاعدة البيانات</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // الاتصال المباشر بالسيرفر المركزي وقاعدة البيانات
+    const API_BASE = '/api';
+    let currentWorkers = [];
+
+    async function loadData() {
+      try {
+        const [ovRes, clRes] = await Promise.all([
+          fetch(`${API_BASE}/portal/overview`),
+          fetch(`${API_BASE}/claims`)
+        ]);
+        const ov = await ovRes.json();
+        const cl = await clRes.json();
+
+        if (ov.success && ov.establishment) {
+          const est = ov.establishment;
+          currentWorkers = est.workers || [];
+
+          document.getElementById('header-est-sub').textContent = est.name;
+          document.getElementById('desktop-est-name').textContent = est.name;
+          document.getElementById('desktop-est-reg').textContent = est.regNo;
+          document.getElementById('m-dash-due').textContent = `${Number(est.totalDue).toLocaleString()} ر.ي`;
+          document.getElementById('pay-screen-amount').textContent = `${Number(est.totalDue).toLocaleString()} ر.ي`;
+
+          const activeWorkers = currentWorkers.filter(w => w.status === 'ACTIVE');
+          document.getElementById('m-dash-workers').textContent = activeWorkers.length;
+          document.getElementById('m-dash-claims').textContent = cl.data ? cl.data.length : 0;
+
+          // قائمة العمال
+          const container = document.getElementById('workers-cards-container');
+          const selectWorker = document.getElementById('mg-select');
+          container.innerHTML = '';
+          selectWorker.innerHTML = '<option value="">-- اختر العامل المستحق --</option>';
+
+          if (currentWorkers.length === 0) {
+            container.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">لا يوجد عمال مسجلون بعد. اضغط "إضافة عامل" للبدء.</div>';
+          } else {
+            currentWorkers.forEach(w => {
+              const card = document.createElement('div');
+              card.className = 'p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/50 flex justify-between items-center text-xs';
+              card.innerHTML = `
+                <div>
+                  <h4 class="font-bold text-slate-900">${w.name}</h4>
+                  <p class="text-[11px] text-slate-500">${w.job} | <span class="font-mono text-slate-700 font-bold">${Number(w.salary).toLocaleString()} ر.ي</span></p>
+                </div>
+                <div>
+                  ${w.status === 'ACTIVE' ? `
+                    <button onclick="terminateWorker('${w.id}')" class="text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg text-[11px] font-bold">إنهاء خدمة</button>
+                  ` : '<span class="text-slate-400 text-[10px]">مستبعد</span>'}
+                </div>
+              `;
+              container.appendChild(card);
+
+              if (w.status === 'ACTIVE') {
+                const opt = document.createElement('option');
+                opt.value = w.id;
+                opt.textContent = `${w.name} (${Number(w.salary).toLocaleString()} ر.ي)`;
+                selectWorker.appendChild(opt);
+              }
+            });
+          }
+
+          // حسابات الرواتب
+          const sum = activeWorkers.reduce((acc, w) => acc + Number(w.salary), 0);
+          const due = (sum * 0.09) + (sum * 0.06);
+          document.getElementById('w-calc-cnt').textContent = `${activeWorkers.length} عمال`;
+          document.getElementById('w-calc-sum').textContent = `${sum.toLocaleString()} ر.ي`;
+          document.getElementById('w-calc-due').textContent = `${due.toLocaleString()} ر.ي`;
+        }
+      } catch (e) {
+        console.error('Connection error:', e);
+      }
+    }
+
+    async function addWorker(e) {
+      e.preventDefault();
+      const name = document.getElementById('in-w-name').value;
+      const job = document.getElementById('in-w-job').value;
+      const salary = document.getElementById('in-w-salary').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/workers/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, job, salary })
+        });
+        if (res.ok) {
+          closeModal('modal-add-w');
+          alert('تم تسجيل العامل وحفظه في السيرفر السحابي بنجاح!');
+          await loadData();
+          e.target.reset();
+        }
+      } catch (err) {
+        alert('فشل الاتصال بالسيرفر');
+      }
+    }
+
+    async function terminateWorker(id) {
+      if (confirm('هل تؤكد استبعاد هذا العامل وإنهاء خدمته؟')) {
+        try {
+          await fetch(`${API_BASE}/workers/terminate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+          });
+          await loadData();
+        } catch (err) {
+          alert('حدث خطأ');
+        }
+      }
+    }
+
+    async function submitWage() {
+      try {
+        const res = await fetch(`${API_BASE}/wages/declare`, { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          alert('تم اعتماد الإقرار وتوليد الفاتورة والقيد المالي في قاعدة البيانات!');
+          await loadData();
+          switchTab('pay');
+        } else {
+          alert(json.error || 'حدث خطأ');
+        }
+      } catch (err) {
+        alert('فشل الاتصال بالسيرفر');
+      }
+    }
+
+    async function payNow() {
+      try {
+        const res = await fetch(`${API_BASE}/payments/pay-invoice`, { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+          alert('تم السداد بنجاح وتوليد قيد القبض وتصفير المديونية!');
+          await loadData();
+        } else {
+          alert(json.error || 'لا توجد فواتير مستحقة');
+        }
+      } catch (err) {
+        alert('فشل الاتصال بالسيرفر');
+      }
+    }
+
+    async function applyGrant(e) {
+      e.preventDefault();
+      const workerId = document.getElementById('mg-select').value;
+      const docNo = document.getElementById('mg-doc').value;
+
+      try {
+        const res = await fetch(`${API_BASE}/claims/marriage-grant`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ workerId, docNo })
+        });
+        if (res.ok) {
+          alert('تم إرسال طلب منحة الزواج بنجاح إلى النظام الداخلي للاعتماد!');
+          await loadData();
+          e.target.reset();
+        }
+      } catch (err) {
+        alert('فشل الاتصال بالسيرفر');
+      }
+    }
+
+    function switchTab(tab) {
+      ['dash', 'workers', 'wages', 'pay', 'marriage'].forEach(t => {
+        document.getElementById(`sec-${t}`).classList.add('hidden');
+        const mBtn = document.getElementById(`m-btn-${t}`);
+        if (mBtn) mBtn.className = 'flex flex-col items-center gap-1 text-[10px] text-slate-500 py-1 px-2 transition';
+        const dBtn = document.getElementById(`d-btn-${t}`);
+        if (dBtn) dBtn.className = 'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 transition text-right';
+      });
+
+      document.getElementById(`sec-${tab}`).classList.remove('hidden');
+      const activeM = document.getElementById(`m-btn-${tab}`);
+      if (activeM) activeM.className = 'mobile-tab-active flex flex-col items-center gap-1 text-[10px] py-1 px-2 transition';
+      const activeD = document.getElementById(`d-btn-${tab}`);
+      if (activeD) activeD.className = 'desktop-nav-active w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-right';
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    // تحميل البيانات وتحديثها كل 3 ثوانٍ للمزامنة الحية
+    loadData();
+    setInterval(loadData, 3000);
+  </script>
+</body>
+</html>
