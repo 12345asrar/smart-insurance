@@ -87,8 +87,11 @@
     <section id="erp-sec-claims" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm">
       <div class="flex justify-between items-center pb-4 mb-4 border-b border-slate-800">
         <div>
-          <h3 class="font-black text-white text-base">الطلبات المحالة من الهاتف للاعتماد والصرف</h3>
-          <p class="text-xs text-slate-400">بمجرد الضغط على "اعتماد وصرف"، ينزل قيد الصرف المحاسبي فوراً ويصرف المبلغ للمستفيد</p>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-bold mb-1.5">
+            <i class="fa-solid fa-venus"></i> خاص بالمؤمن عليهن (الإناث فقط)
+          </div>
+          <h3 class="font-black text-white text-base">طلبات تعويض زواج المؤمن عليها (رد رصيد الاشتراكات المسددة)</h3>
+          <p class="text-xs text-slate-400">بموجب اللائحة التأمينية: تعويض الزواج يصرف للإناث فقط كرد لرصيد الاشتراكات المدفوعة. عند الضغط على "اعتماد وصرف"، ينزل قيد الصرف بالدفاتر فوراً.</p>
         </div>
       </div>
 
@@ -97,9 +100,9 @@
           <thead class="bg-slate-950 text-slate-400 text-xs font-bold border-b border-slate-800">
             <tr>
               <th class="p-3">رقم المعاملة</th>
-              <th class="p-3">المؤمن عليه</th>
+              <th class="p-3">المؤمن عليها (أنثى)</th>
               <th class="p-3">وثيقة العقد</th>
-              <th class="p-3">مبلغ المنحة</th>
+              <th class="p-3">رصيد الاشتراكات المسددة</th>
               <th class="p-3">الحالة</th>
               <th class="p-3 text-center">القرار المالي</th>
             </tr>
@@ -232,13 +235,13 @@
         const cBody = document.getElementById('erp-claims-body');
         cBody.innerHTML = '';
         if (!cl.data || cl.data.length === 0) {
-          cBody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">لا توجد طلبات منح زواج محالة من الهاتف حتى الآن.</td></tr>';
+          cBody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">لا توجد طلبات تعويض زواج (رد اشتراكات) محالة من الهاتف حتى الآن.</td></tr>';
         } else {
           cl.data.forEach(c => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
               <td class="p-3 font-mono font-bold text-sky-400 text-xs">${c.claimNo}</td>
-              <td class="p-3 font-bold">${c.workerName}</td>
+              <td class="p-3 font-bold"><i class="fa-solid fa-venus text-rose-400 ml-1 text-xs"></i> ${c.workerName}</td>
               <td class="p-3 font-mono text-xs text-slate-400">${c.doc}</td>
               <td class="p-3 font-mono font-black text-rose-400">${Number(c.amount).toLocaleString()} ر.ي</td>
               <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-bold ${c.status === 'SUBMITTED' ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'}">${c.status === 'SUBMITTED' ? 'بانتظار الاعتماد' : 'تم الصرف الفعلي'}</span></td>

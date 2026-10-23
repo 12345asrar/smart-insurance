@@ -77,6 +77,7 @@ app.get('/api/portal/overview', async (req: Request, res: Response) => {
           memberId: w.insuredMemberId,
           name: w.insuredMember.fullName,
           insNo: w.insuredMember.insuranceNo,
+          gender: w.insuredMember.gender, // MALE / FEMALE
           job: w.jobTitle,
           salary: Number(w.totalSalary),
           status: w.status,
@@ -117,7 +118,7 @@ app.get('/api/claims', async (req: Request, res: Response) => {
 // 4. تسجيل عامل جديد (سواء من الهاتف أو الكمبيوتر)
 app.post('/api/workers/register', async (req: Request, res: Response) => {
   try {
-    const { name, job, salary } = req.body;
+    const { name, job, salary, gender } = req.body;
     const est = await prisma.establishment.findFirstOrThrow();
 
     const member = await prisma.insuredMember.create({
@@ -125,7 +126,7 @@ app.post('/api/workers/register', async (req: Request, res: Response) => {
         nationalId: `NID-${Date.now().toString().slice(-8)}`,
         insuranceNo: `INS-${Math.floor(10000 + Math.random() * 90000)}`,
         fullName: name,
-        gender: 'MALE',
+        gender: gender === 'FEMALE' ? 'FEMALE' : 'MALE',
         birthDate: new Date('1995-01-01'),
         phone: '770000000',
         maritalStatus: 'SINGLE',
@@ -412,16 +413,27 @@ app.post('/api/accounting/receive-payment', async (req: Request, res: Response) 
   }
 });
 
-// 8. تقديم طلب منحة زواج (من الهاتف)
+// 8. تقديم طلب تعويض زواج المؤمن عليها (للإناث فقط - رد رصيد الاشتراكات المسددة)
 app.post('/api/claims/marriage-grant', async (req: Request, res: Response) => {
   try {
-    const { workerId, docNo } = req.body;
+    const { workerId, docNo, refundAmount } = req.body;
     const emp = await prisma.employmentRecord.findUniqueOrThrow({
       where: { id: workerId },
       include: { insuredMember: true },
     });
 
-    const amount = Number(emp.totalSalary) * 2; // راتب شهرين
+    // 1. التحقق القانوني: للمؤمن عليهن الإناث فقط
+    if (emp.insuredMember.gender !== 'FEMALE') {
+      return res.status(400).json({
+        success: false,
+        error: 'تنبيه قانوني: تعويض ومنحة الزواج مخصصة حصرياً للمؤمن عليهن (الإناث فقط) بموجب اللائحة التأمينية.',
+      });
+    }
+
+    // 2. احتساب المبلغ: تعويض رصيد الاشتراكات المسددة (وليس راتب شهرين)
+    // يحسب على أساس الاشتراكات المسددة أو المبلغ المدخل
+    const months = Math.max(1, Math.floor((Date.now() - new Date(emp.startDate).getTime()) / (1000 * 60 * 60 * 24 * 30)));
+    const calculated = refundAmount ? Number(refundAmount) : (Number(emp.totalSalary) * 0.06 * months);
 
     const claim = await prisma.benefitClaim.create({
       data: {
@@ -430,7 +442,7 @@ app.post('/api/claims/marriage-grant', async (req: Request, res: Response) => {
         claimType: 'MARRIAGE_GRANT',
         eventDate: new Date(),
         documentNo: docNo || 'عقد زواج رسمي',
-        calculatedAmount: amount,
+        calculatedAmount: calculated,
         status: 'SUBMITTED',
       },
     });

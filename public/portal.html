@@ -201,23 +201,38 @@
         </div>
       </section>
 
-      <!-- 5. منحة الزواج -->
+      <!-- 5. منحة وتعويض زواج المؤمن عليها -->
       <section id="sec-marriage" class="space-y-4 hidden">
-        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm max-w-md">
-          <h3 class="font-black text-slate-800 text-base mb-1">طلب صرف منحة الزواج</h3>
-          <p class="text-xs text-slate-400 mb-4">تصرف مباشرة للمؤمن عليه براتب شهرين</p>
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-sm max-w-md space-y-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200 text-[11px] font-bold mb-2">
+              <i class="fa-solid fa-venus"></i> خاص بالمؤمن عليهن (الإناث فقط)
+            </div>
+            <h3 class="font-black text-slate-800 text-base">طلب تعويض زواج المؤمن عليها</h3>
+            <p class="text-xs text-slate-500 mt-1">يصرف للمؤمن عليها عند الزواج كتعويض لرد رصيد الاشتراكات المسددة بحسب اللائحة التأمينية الرسمية.</p>
+          </div>
 
-          <form onsubmit="applyGrant(event)" class="space-y-3 text-xs font-bold">
+          <div id="mg-female-warning" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs font-bold flex items-start gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-rose-500 mt-0.5 shrink-0"></i>
+            <span>تنبيه: لا توجد موظفات إناث مسجلات حالياً. تعويض الزواج مخصص قانوناً للإناث فقط، يرجى تسجيل موظفة أنثى من قسم العمال.</span>
+          </div>
+
+          <form id="mg-form" onsubmit="applyGrant(event)" class="space-y-3 text-xs font-bold">
             <div>
-              <label class="block text-slate-700 mb-1">اختر العامل</label>
-              <select id="mg-select" required class="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"></select>
+              <label class="block text-slate-700 mb-1">المؤمن عليها المستحقة (الإناث فقط):</label>
+              <select id="mg-select" required onchange="calculateRefundAmount()" class="w-full p-2.5 border border-slate-300 rounded-xl bg-white text-xs"></select>
             </div>
             <div>
-              <label class="block text-slate-700 mb-1">رقم وثيقة عقد الزواج</label>
-              <input id="mg-doc" required type="text" placeholder="مثال: م/2026/88" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-mono">
+              <label class="block text-slate-700 mb-1">مبلغ تعويض رصيد الاشتراكات المسددة (ر.ي):</label>
+              <input id="mg-amount" required type="number" placeholder="المبلغ المسدد المستحق للرد..." class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-mono font-bold text-rose-600 bg-rose-50/50">
+              <p class="text-[10px] text-slate-400 font-normal mt-1">يتم احتساب رصيد الاشتراكات المسددة للمؤمن عليها تلقائياً، ويمكن تعديله.</p>
             </div>
-            <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-xs shadow transition mt-2">
-              إرسال طلب المنحة للنظام الداخلي
+            <div>
+              <label class="block text-slate-700 mb-1">رقم وثيقة عقد الزواج الرسمي:</label>
+              <input id="mg-doc" required type="text" placeholder="مثال: وثيقة عقد رقم 1045 لسنة 2026" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-mono font-normal">
+            </div>
+            <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-xs shadow transition mt-2 flex items-center justify-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i> إرسال طلب صرف التعويض للنظام المالي
             </button>
           </form>
         </div>
@@ -301,9 +316,18 @@
           <label class="block text-slate-700 mb-1">اسم العامل الرباعي</label>
           <input id="in-w-name" required type="text" placeholder="الاسم..." class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal">
         </div>
-        <div>
-          <label class="block text-slate-700 mb-1">المسمى الوظيفي</label>
-          <input id="in-w-job" required type="text" placeholder="المسمى الوظيفي..." class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-700 mb-1">الجنس</label>
+            <select id="in-w-gender" class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal bg-white">
+              <option value="MALE">ذكر (موظف)</option>
+              <option value="FEMALE">أنثى (موظفة)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-700 mb-1">المسمى الوظيفي</label>
+            <input id="in-w-job" required type="text" placeholder="المسمى الوظيفي..." class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal">
+          </div>
         </div>
         <div>
           <label class="block text-slate-700 mb-1">الأجر التأميني (ريال)</label>
@@ -362,19 +386,26 @@
           // قائمة العمال
           const container = document.getElementById('workers-cards-container');
           const selectWorker = document.getElementById('mg-select');
+          const femaleWarning = document.getElementById('mg-female-warning');
           container.innerHTML = '';
-          selectWorker.innerHTML = '<option value="">-- اختر العامل المستحق --</option>';
+          selectWorker.innerHTML = '<option value="">-- اختر المؤمن عليها المستحقة --</option>';
 
           if (currentWorkers.length === 0) {
             container.innerHTML = '<div class="p-6 text-center text-slate-400 text-xs">لا يوجد عمال مسجلون حالياً. اضغط "إضافة عامل" للبدء.</div>';
           } else {
             currentWorkers.forEach(w => {
+              const isFemale = w.gender === 'FEMALE';
               const card = document.createElement('div');
               card.className = 'p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/50 flex justify-between items-center text-xs';
               card.innerHTML = `
                 <div>
-                  <h4 class="font-bold text-slate-900">${w.name}</h4>
-                  <p class="text-[11px] text-slate-500">${w.job} | <span class="font-mono text-slate-700 font-bold">${Number(w.salary).toLocaleString()} ر.ي</span></p>
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-bold text-slate-900">${w.name}</h4>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${isFemale ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-sky-50 text-sky-600 border border-sky-200'}">
+                      ${isFemale ? 'أنثى' : 'ذكر'}
+                    </span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 mt-0.5">${w.job} | <span class="font-mono text-slate-700 font-bold">${Number(w.salary).toLocaleString()} ر.ي</span></p>
                 </div>
                 <div class="flex items-center gap-1.5">
                   ${w.status === 'ACTIVE' ? `
@@ -386,14 +417,24 @@
                 </div>
               `;
               container.appendChild(card);
-
-              if (w.status === 'ACTIVE') {
-                const opt = document.createElement('option');
-                opt.value = w.id;
-                opt.textContent = `${w.name} (${Number(w.salary).toLocaleString()} ر.ي)`;
-                selectWorker.appendChild(opt);
-              }
             });
+          }
+
+          // تصفية المؤمن عليهن الإناث فقط لمنحة وتعويض الزواج
+          const femaleWorkers = currentWorkers.filter(w => w.status === 'ACTIVE' && w.gender === 'FEMALE');
+          if (femaleWorkers.length === 0) {
+            if (femaleWarning) femaleWarning.classList.remove('hidden');
+            selectWorker.innerHTML = '<option value="">-- لا توجد مؤمن عليهن إناث مسجلات --</option>';
+            document.getElementById('mg-amount').value = '';
+          } else {
+            if (femaleWarning) femaleWarning.classList.add('hidden');
+            femaleWorkers.forEach(w => {
+              const opt = document.createElement('option');
+              opt.value = w.id;
+              opt.textContent = `${w.name} (أنثى - الأجر: ${Number(w.salary).toLocaleString()} ر.ي)`;
+              selectWorker.appendChild(opt);
+            });
+            calculateRefundAmount();
           }
 
           // حسابات الرواتب
@@ -466,17 +507,33 @@
       }
     }
 
+    function calculateRefundAmount() {
+      const selectWorker = document.getElementById('mg-select');
+      const amtInput = document.getElementById('mg-amount');
+      if (!selectWorker || !amtInput) return;
+      const workerId = selectWorker.value;
+      const worker = currentWorkers.find(w => w.id === workerId);
+      if (worker) {
+        // احتساب رصيد الاشتراكات المسددة للمؤمن عليها (مثلاً 6% عن سنة خدمة أو الرصيد المدخر)
+        const estimatedBalance = Math.round(Number(worker.salary) * 0.06 * 12);
+        amtInput.value = estimatedBalance;
+      } else {
+        amtInput.value = '';
+      }
+    }
+
     async function addWorker(e) {
       e.preventDefault();
       const name = document.getElementById('in-w-name').value;
       const job = document.getElementById('in-w-job').value;
       const salary = document.getElementById('in-w-salary').value;
+      const gender = document.getElementById('in-w-gender') ? document.getElementById('in-w-gender').value : 'MALE';
 
       try {
         const res = await fetch(`${API_BASE}/workers/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, job, salary })
+          body: JSON.stringify({ name, job, salary, gender })
         });
         if (res.ok) {
           closeModal('modal-add-w');
@@ -557,17 +614,26 @@
       e.preventDefault();
       const workerId = document.getElementById('mg-select').value;
       const docNo = document.getElementById('mg-doc').value;
+      const refundAmount = document.getElementById('mg-amount').value;
+
+      if (!workerId) {
+        alert('يرجى اختيار المؤمن عليها المستحقة');
+        return;
+      }
 
       try {
         const res = await fetch(`${API_BASE}/claims/marriage-grant`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ workerId, docNo })
+          body: JSON.stringify({ workerId, docNo, refundAmount })
         });
-        if (res.ok) {
-          alert('تم إرسال طلب منحة الزواج بنجاح إلى النظام الداخلي للاعتماد!');
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ تم إرسال طلب تعويض زواج المؤمن عليها (رد الاشتراكات المسددة) بنجاح إلى النظام المالي!');
           await loadData();
           e.target.reset();
+        } else {
+          alert(data.error || 'حدث خطأ في تقديم الطلب');
         }
       } catch (err) {
         alert('فشل الاتصال بالسيرفر');
