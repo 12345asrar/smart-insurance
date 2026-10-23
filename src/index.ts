@@ -72,12 +72,15 @@ app.get('/api/portal/overview', async (req: Request, res: Response) => {
         regNo: establishment.registrationNo,
         phone: establishment.phone,
         totalDue,
-        workers: establishment.workers.map((w) => ({
+        workers: establishment.workers.map((w: any) => ({
           id: w.id,
           memberId: w.insuredMemberId,
           name: w.insuredMember.fullName,
           insNo: w.insuredMember.insuranceNo,
+          nationalId: w.insuredMember.nationalId,
           gender: w.insuredMember.gender, // MALE / FEMALE
+          motherName: w.insuredMember.motherName || 'غير مسجل',
+          idCardImage: w.insuredMember.idCardImage || null,
           job: w.jobTitle,
           salary: Number(w.totalSalary),
           status: w.status,
@@ -118,19 +121,31 @@ app.get('/api/claims', async (req: Request, res: Response) => {
 // 4. تسجيل عامل جديد (سواء من الهاتف أو الكمبيوتر)
 app.post('/api/workers/register', async (req: Request, res: Response) => {
   try {
-    const { name, job, salary, gender } = req.body;
+    const { name, job, salary, gender, motherName, nationalId, idCardImage } = req.body;
     const est = await prisma.establishment.findFirstOrThrow();
+
+    // التأكد من وجود أعمدة اسم الأم وصورة البطاقة بقاعدة بيانات PostgreSQL
+    try {
+      await prisma.$executeRawUnsafe(`
+        ALTER TABLE "insured_members" ADD COLUMN IF NOT EXISTS "motherName" TEXT;
+        ALTER TABLE "insured_members" ADD COLUMN IF NOT EXISTS "idCardImage" TEXT;
+      `);
+    } catch (e) {
+      // ignore
+    }
 
     const member = await prisma.insuredMember.create({
       data: {
-        nationalId: `NID-${Date.now().toString().slice(-8)}`,
+        nationalId: nationalId || `NID-${Date.now().toString().slice(-8)}`,
         insuranceNo: `INS-${Math.floor(10000 + Math.random() * 90000)}`,
         fullName: name,
         gender: gender === 'FEMALE' ? 'FEMALE' : 'MALE',
+        motherName: motherName || null,
+        idCardImage: idCardImage || null,
         birthDate: new Date('1995-01-01'),
         phone: '770000000',
         maritalStatus: 'SINGLE',
-      },
+      } as any,
     });
 
     const employment = await prisma.employmentRecord.create({

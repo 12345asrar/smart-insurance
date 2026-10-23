@@ -306,35 +306,81 @@
 
   <!-- Modal إضافة عامل -->
   <div id="modal-add-w" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl">
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="font-bold text-slate-800 text-sm">تسجيل عامل جديد</h3>
-        <button onclick="closeModal('modal-add-w')" class="text-slate-400"><i class="fa-solid fa-xmark text-base"></i></button>
+    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+          <i class="fa-solid fa-user-plus text-sky-600"></i> تسجيل مؤمن عليه جديد
+        </h3>
+        <button onclick="closeModal('modal-add-w')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-base"></i></button>
       </div>
       <form onsubmit="addWorker(event)" class="space-y-3 text-xs font-bold">
         <div>
-          <label class="block text-slate-700 mb-1">اسم العامل الرباعي</label>
-          <input id="in-w-name" required type="text" placeholder="الاسم..." class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal">
+          <label class="block text-slate-700 mb-1">اسم العامل الرباعي <span class="text-rose-500">*</span></label>
+          <input id="in-w-name" required type="text" placeholder="مثال: أحمد محمد علي حسن..." class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-normal outline-none focus:border-sky-500">
         </div>
+
+        <div>
+          <label class="block text-slate-700 mb-1">اسم الأم الثلاثي <span class="text-rose-500">*</span></label>
+          <input id="in-w-mother" required type="text" placeholder="مثال: فاطمة صالح أحمد..." class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-normal outline-none focus:border-sky-500">
+        </div>
+
         <div class="grid grid-cols-2 gap-2">
           <div>
             <label class="block text-slate-700 mb-1">الجنس</label>
-            <select id="in-w-gender" class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal bg-white">
+            <select id="in-w-gender" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-normal bg-white outline-none focus:border-sky-500">
               <option value="MALE">ذكر (موظف)</option>
               <option value="FEMALE">أنثى (موظفة)</option>
             </select>
           </div>
           <div>
             <label class="block text-slate-700 mb-1">المسمى الوظيفي</label>
-            <input id="in-w-job" required type="text" placeholder="المسمى الوظيفي..." class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal">
+            <input id="in-w-job" required type="text" placeholder="المسمى الوظيفي..." class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-normal outline-none focus:border-sky-500">
           </div>
         </div>
-        <div>
-          <label class="block text-slate-700 mb-1">الأجر التأميني (ريال)</label>
-          <input id="in-w-salary" required type="number" step="5000" value="250000" class="w-full p-2 border border-slate-300 rounded-xl text-xs font-normal font-mono">
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-700 mb-1">رقم البطاقة الشخصية</label>
+            <input id="in-w-nid" type="text" placeholder="01010045879" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-mono font-normal outline-none focus:border-sky-500">
+          </div>
+          <div>
+            <label class="block text-slate-700 mb-1">الأجر التأميني (ر.ي)</label>
+            <input id="in-w-salary" required type="number" step="5000" value="250000" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-normal font-mono outline-none focus:border-sky-500">
+          </div>
         </div>
-        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white py-2.5 rounded-xl text-xs font-bold mt-2">تأكيد الحفظ في قاعدة البيانات</button>
+
+        <div>
+          <label class="block text-slate-700 mb-1">صورة البطاقة الشخصية (إلزامي للتوثيق) <span class="text-rose-500">*</span></label>
+          <div class="border-2 border-dashed border-slate-300 rounded-xl p-2.5 bg-slate-50 text-center space-y-1.5">
+            <input id="in-w-idcard" required type="file" accept="image/*" onchange="previewIdCard(event)" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-sky-600 file:text-white cursor-pointer">
+            <div id="idcard-preview-box" class="hidden">
+              <img id="idcard-preview-img" class="h-20 mx-auto rounded-lg shadow border border-slate-200 object-cover" alt="معاينة البطاقة">
+              <p class="text-[10px] text-emerald-600 font-bold mt-1">✅ تم إرفاق صورة البطاقة</p>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white py-2.5 rounded-xl text-xs font-bold mt-2 shadow transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-check"></i> حفظ المؤمن عليه وصورة البطاقة
+        </button>
       </form>
+    </div>
+  </div>
+
+  <!-- Modal عرض صورة البطاقة الشخصية -->
+  <div id="modal-view-idcard" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 shadow-2xl border border-slate-100 space-y-3">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <h3 id="view-idcard-title" class="font-black text-slate-800 text-sm">البطاقة الشخصية للمؤمن عليه</h3>
+        <button onclick="closeModal('modal-view-idcard')" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div class="rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 flex items-center justify-center p-2 min-h-[220px]">
+        <img id="view-idcard-img" class="max-h-[320px] w-auto object-contain rounded-xl" alt="البطاقة الشخصية">
+      </div>
+      <div class="flex justify-between items-center text-xs text-slate-500 pt-1">
+        <span id="view-idcard-meta" class="font-bold text-slate-700"></span>
+        <button onclick="closeModal('modal-view-idcard')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-1.5 rounded-xl">إغلاق</button>
+      </div>
     </div>
   </div>
 
@@ -406,8 +452,17 @@
                     </span>
                   </div>
                   <p class="text-[11px] text-slate-500 mt-0.5">${w.job} | <span class="font-mono text-slate-700 font-bold">${Number(w.salary).toLocaleString()} ر.ي</span></p>
+                  <p class="text-[10px] text-slate-500 mt-0.5">
+                    <span class="text-slate-400">اسم الأم:</span> <span class="font-bold text-slate-700">${w.motherName || 'غير مسجل'}</span>
+                    ${w.nationalId ? ` | <span class="text-slate-400">البطاقة:</span> <span class="font-mono text-slate-700">${w.nationalId}</span>` : ''}
+                  </p>
                 </div>
                 <div class="flex items-center gap-1.5">
+                  ${w.idCardImage ? `
+                    <button onclick="viewIdCard('${w.id}')" class="text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 px-2 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition" title="عرض صورة البطاقة الشخصية">
+                      <i class="fa-solid fa-id-card"></i> البطاقة
+                    </button>
+                  ` : ''}
                   ${w.status === 'ACTIVE' ? `
                     <button onclick="terminateWorker('${w.id}')" class="text-amber-700 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-lg text-[11px] font-bold transition">إنهاء خدمة</button>
                   ` : '<span class="text-slate-400 text-[10px] bg-slate-100 px-2 py-0.5 rounded">مستبعد</span>'}
@@ -522,24 +577,63 @@
       }
     }
 
+    let currentUploadedIdCard = null;
+
+    function previewIdCard(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          currentUploadedIdCard = evt.target.result;
+          const previewImg = document.getElementById('idcard-preview-img');
+          const previewBox = document.getElementById('idcard-preview-box');
+          if (previewImg && previewBox) {
+            previewImg.src = currentUploadedIdCard;
+            previewBox.classList.remove('hidden');
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function viewIdCard(workerId) {
+      const worker = currentWorkers.find(w => w.id === workerId);
+      if (worker && worker.idCardImage) {
+        document.getElementById('view-idcard-img').src = worker.idCardImage;
+        document.getElementById('view-idcard-title').textContent = `البطاقة الشخصية: ${worker.name}`;
+        document.getElementById('view-idcard-meta').textContent = `اسم الأم: ${worker.motherName || 'غير مسجل'} ${worker.nationalId ? `| الرقم الوطني: ${worker.nationalId}` : ''}`;
+        openModal('modal-view-idcard');
+      } else {
+        alert('لم يتم إرفاق صورة بطاقة لهذا العامل.');
+      }
+    }
+
     async function addWorker(e) {
       e.preventDefault();
       const name = document.getElementById('in-w-name').value;
+      const motherName = document.getElementById('in-w-mother').value;
       const job = document.getElementById('in-w-job').value;
       const salary = document.getElementById('in-w-salary').value;
       const gender = document.getElementById('in-w-gender') ? document.getElementById('in-w-gender').value : 'MALE';
+      const nationalId = document.getElementById('in-w-nid').value;
+      const idCardImage = currentUploadedIdCard;
 
       try {
         const res = await fetch(`${API_BASE}/workers/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, job, salary, gender })
+          body: JSON.stringify({ name, motherName, job, salary, gender, nationalId, idCardImage })
         });
         if (res.ok) {
           closeModal('modal-add-w');
-          alert('تم تسجيل العامل وحفظه في السيرفر السحابي بنجاح!');
+          alert('تم تسجيل المؤمن عليه وحفظ اسم الأم وصورة البطاقة في السيرفر السحابي بنجاح!');
+          currentUploadedIdCard = null;
+          const pBox = document.getElementById('idcard-preview-box');
+          if (pBox) pBox.classList.add('hidden');
           await loadData();
           e.target.reset();
+        } else {
+          alert('حدث خطأ أثناء حفظ العامل');
         }
       } catch (err) {
         alert('فشل الاتصال بالسيرفر');

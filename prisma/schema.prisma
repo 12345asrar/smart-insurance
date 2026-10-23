@@ -43,6 +43,8 @@ model InsuredMember {
   insuranceNo      String   @unique // الرقم التأميني الموحد للعامل
   fullName         String   // الاسم الرباعي
   gender           String   // MALE, FEMALE
+  motherName       String?  // اسم الأم الثلاثي
+  idCardImage      String?  // رابط أو ترميز صورة البطاقة الشخصية
   birthDate        DateTime
   maritalStatus    String   // SINGLE, MARRIED, WIDOWED, DIVORCED
   bankIban         String?  // رقم الآيبان البنكي / المحفظة لصرف التعويضات
