@@ -202,6 +202,43 @@ app.post('/api/establishment/update', async (req: Request, res: Response) => {
   }
 });
 
+// 5.3 تصفير وتنظيف كافة البيانات التجريبية لتسليم النظام نظيفاً 100%
+app.post('/api/system/reset-data', async (req: Request, res: Response) => {
+  try {
+    // 1. حذف القيود المالية وحركاتها
+    await prisma.journalLine.deleteMany();
+    await prisma.journalEntry.deleteMany();
+    await prisma.paymentTransaction.deleteMany();
+
+    // 2. حذف الفواتير والمطالبات
+    await prisma.benefitClaim.deleteMany();
+    await prisma.insuranceInvoice.deleteMany();
+    await prisma.wageDeclaration.deleteMany();
+
+    // 3. حذف سجلات العمال والمشتركين
+    await prisma.workerMovement.deleteMany();
+    await prisma.employmentRecord.deleteMany();
+    await prisma.insuredMember.deleteMany();
+
+    // 4. تحديث اسم المنشأة إذا تم إرسال اسم جديد
+    const { estName, estReg } = req.body;
+    let est = await prisma.establishment.findFirst();
+    if (est) {
+      est = await prisma.establishment.update({
+        where: { id: est.id },
+        data: {
+          name: estName || 'شركة الزبون المعتمدة',
+          registrationNo: estReg || 'EST-202601',
+        },
+      });
+    }
+
+    res.json({ success: true, message: 'تم تصفير وتنظيف كافة البيانات التجريبية بنجاح! النظام الآن نظيف 100% وجاهز للزبون.' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // 6. إقرار الرواتب وتوليد القيد الآلي
 app.post('/api/wages/declare', async (req: Request, res: Response) => {
   try {

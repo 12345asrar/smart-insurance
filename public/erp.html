@@ -28,6 +28,9 @@
         </div>
       </div>
       <div class="flex items-center gap-3">
+        <button onclick="resetSystemData()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-broom"></i> تصفير البيانات لتسليم الزبون
+        </button>
         <span class="text-xs bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-300 flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
           <span class="text-emerald-400 font-bold">سحابي مباشر 24/7</span>
@@ -220,6 +223,30 @@
       });
       document.getElementById(`erp-sec-${tab}`).classList.remove('hidden');
       document.getElementById(`tab-btn-${tab}`).className = 'pb-3 text-sky-400 border-b-2 border-sky-500 font-black';
+    }
+
+    async function resetSystemData() {
+      const estName = prompt('تصفير كامل البيانات لتسليم النظام للزبون:\nاكتب اسم شركة الزبون الرسمية:', 'شركة الزبون المعتمدة');
+      if (estName !== null) {
+        if (confirm('تنبيه: سيتم مسح جميع العمال والقيود المالية والفواتير بالكامل لتسليم النظام نظيفاً 100%.\n\nهل تؤكد التصفير الآن؟')) {
+          try {
+            const res = await fetch(`${API_BASE}/system/reset-data`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ estName })
+            });
+            const data = await res.json();
+            if (data.success) {
+              alert('✅ تم تصفير وتنظيف النظام بنجاح 100%!\nالنظام الآن نظيف وفارغ وجاهز للتسليم.');
+              await loadERP();
+            } else {
+              alert(data.error || 'حدث خطأ');
+            }
+          } catch (e) {
+            alert('فشل الاتصال بالسيرفر');
+          }
+        }
+      }
     }
 
     loadERP();
