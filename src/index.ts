@@ -298,7 +298,7 @@ app.post('/api/wages/declare', async (req: Request, res: Response) => {
   }
 });
 
-// 7. سداد الفاتورة إلكترونياً عن بعد
+// 7. سداد الفاتورة إلكترونياً عن بعد (من بوابة المشتركين بالجوال)
 app.post('/api/payments/pay-invoice', async (req: Request, res: Response) => {
   try {
     const invoice = await prisma.insuranceInvoice.findFirst({
@@ -335,6 +335,78 @@ app.post('/api/payments/pay-invoice', async (req: Request, res: Response) => {
     });
 
     res.json({ success: true, payment });
+  } catch (error: any) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
+// 7.1 سند قبض مباشر من النظام المالي المركزي (تنزيل سداد الاشتراكات وتوليد القيد المحاسبي)
+app.post('/api/accounting/receive-payment', async (req: Request, res: Response) => {
+  try {
+    const { receiptNo, amount, method, notes } = req.body;
+    
+    // البحث عن فاتورة غير مسددة أو أحدث فاتورة للمنشأة
+    let invoice = await prisma.insuranceInvoice.findFirst({
+      where: { status: 'UNPAID' },
+      include: { establishment: true },
+    });
+
+    const est = await prisma.establishment.findFirstOrThrow();
+    const payAmount = amount ? Number(amount) : (invoice ? Number(invoice.amountDue) : 0);
+
+    if (payAmount <= 0) {
+      return res.status(400).json({ success: false, error: 'يرجى إدخال مبلغ صحيح لسند القبض' });
+    }
+
+    // إذا لم تكن هناك فاتورة قائمة، ننشئ سجلاً للفاتورة لتوثيق التحصيل
+    if (!invoice) {
+      invoice = await prisma.insuranceInvoice.create({
+        data: {
+          invoiceNo: `INV-DIR-${Date.now().toString().slice(-5)}`,
+          establishmentId: est.id,
+          month: new Date().getMonth() + 1,
+          year: new Date().getFullYear(),
+          amountDue: payAmount,
+          dueDate: new Date(),
+          status: 'PAID',
+          amountPaid: payAmount,
+        },
+        include: { establishment: true },
+      });
+    } else {
+      await prisma.insuranceInvoice.update({
+        where: { id: invoice.id },
+        data: { status: 'PAID', amountPaid: payAmount },
+      });
+    }
+
+    const payTxnNo = receiptNo || `REC-ERP-${Date.now().toString().slice(-6)}`;
+
+    const payment = await prisma.paymentTransaction.create({
+      data: {
+        transactionNo: payTxnNo,
+        invoiceId: invoice.id,
+        amount: payAmount,
+        paymentMethod: method === 'CASH' ? 'CASH' : 'BANK_TRANSFER',
+        status: 'SUCCESS',
+      },
+    });
+
+    // توليد القيد المحاسبي المزدوج في دفتر اليومية
+    const entry = await accountingEngine.recordPaymentEntry({
+      paymentId: payment.id,
+      transactionNo: payTxnNo,
+      invoiceNo: invoice.invoiceNo,
+      establishmentName: est.name,
+      amount: payAmount,
+    });
+
+    res.json({
+      success: true,
+      message: 'تم ترحيل سند القبض المالي بنجاح! وسقطت المديونية من بوابة الاشتراكات ونزل القيد المحاسبي بالمالي.',
+      payment,
+      entry,
+    });
   } catch (error: any) {
     res.status(400).json({ success: false, error: error.message });
   }

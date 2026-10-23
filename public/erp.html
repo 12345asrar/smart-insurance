@@ -78,6 +78,9 @@
       <button onclick="switchTab('ledger')" id="tab-btn-ledger" class="pb-3 text-slate-400 hover:text-white">
         <i class="fa-solid fa-book-journal-whills ml-1.5"></i> 2. دفتر اليومية العامة (القيود الآلية)
       </button>
+      <button onclick="switchTab('receipt')" id="tab-btn-receipt" class="pb-3 text-slate-400 hover:text-white">
+        <i class="fa-solid fa-receipt ml-1.5 text-amber-400"></i> 3. سند قبض مالي (السداد من المالي إلى الاشتراكات)
+      </button>
     </div>
 
     <!-- 1. شاشة الاعتماد -->
@@ -117,22 +120,113 @@
       <div id="erp-journal-container" class="space-y-4"></div>
     </section>
 
+    <!-- 3. شاشة سند القبض المالي المباشر (الربط العكسي: من المالي إلى الاشتراكات) -->
+    <section id="erp-sec-receipt" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm hidden space-y-6">
+      <div class="border-b border-slate-800 pb-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs font-bold mb-2">
+          <i class="fa-solid fa-arrows-rotate animate-spin"></i> الربط الثنائي اللحظي: من المالي ⬅️ إلى بوابة الاشتراكات
+        </div>
+        <h3 class="font-black text-white text-base">تسجيل سند قبض اشتراكات تأمينية (مباشرة من النظام المالي)</h3>
+        <p class="text-xs text-slate-400 mt-1">عند استلام مبلغ كاش بالصندوق أو حوالة بنكية، أدخل السداد هنا وسيسقط آلياً من ذمة المنشأة في بوابة المشتركين وينزل قيد محاسبي مزدوج بالدفاتر.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-950/70 border border-slate-800 p-5 rounded-2xl space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">المنشأة المستهدفة:</label>
+            <div id="rec-est-display" class="bg-slate-900 border border-slate-700 px-3.5 py-2.5 rounded-xl font-bold text-sky-400 text-sm">جاري جلب المنشأة...</div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">المبلغ المستحق الحالي في الاشتراكات:</label>
+            <div id="rec-due-display" class="bg-slate-900 border border-slate-700 px-3.5 py-2.5 rounded-xl font-mono font-black text-amber-400 text-lg">0 ر.ي</div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-400 mb-1">مبلغ سند القبض المسدد (ر.ي):</label>
+            <input type="number" id="rec-amount-input" class="w-full bg-slate-900 border border-slate-700 text-white font-mono font-bold px-3.5 py-2.5 rounded-xl focus:border-amber-500 outline-none" placeholder="أدخل المبلغ المقبوض">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">طريقة القبض:</label>
+              <select id="rec-method-select" class="w-full bg-slate-900 border border-slate-700 text-white font-bold px-3 py-2.5 rounded-xl text-xs focus:border-amber-500 outline-none">
+                <option value="CASH">نقداً في الصندوق المركزي (1101)</option>
+                <option value="BANK_TRANSFER">تحويل بنكي / شيك (1101)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">رقم مرجع السند / الشيك:</label>
+              <input type="text" id="rec-ref-input" class="w-full bg-slate-900 border border-slate-700 text-white font-mono text-xs px-3 py-2.5 rounded-xl" placeholder="REC-2026-001">
+            </div>
+          </div>
+
+          <button onclick="submitFinancialReceipt()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-3 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-stamp"></i> ترحيل سند القبض وتحديث رصيد المنشأة في الاشتراكات فوراً
+          </button>
+        </div>
+
+        <div class="bg-slate-950/40 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <h4 class="font-bold text-white text-sm flex items-center gap-2">
+              <i class="fa-solid fa-circle-nodes text-sky-400"></i> ماذا سيحدث عند ضغط الترحيل؟
+            </h4>
+            <div class="text-xs text-slate-300 space-y-2 leading-relaxed">
+              <div class="flex items-start gap-2 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                <span class="text-emerald-400 font-bold shrink-0">1. في النظام المالي:</span>
+                <span>ينزل قيد محاسبي متزن آلياً (من حـ/ الصندوق أو البنك إلى حـ/ اشتراكات تحت التحصيل).</span>
+              </div>
+              <div class="flex items-start gap-2 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                <span class="text-sky-400 font-bold shrink-0">2. في بوابة الاشتراكات:</span>
+                <span>تسقط الفاتورة فوراً من جوال المشترك ويتحول رصيده إلى 0 ر.ي مع إشعار رسمي بالسداد.</span>
+              </div>
+              <div class="flex items-start gap-2 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                <span class="text-amber-400 font-bold shrink-0">3. في التقارير والميزان:</span>
+                <span>يتطابق ميزان المراجعة وتظهر الحركة في كشف حساب المنشأة مباشرة.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-xs font-bold flex items-center gap-2">
+            <i class="fa-solid fa-shield-check text-base"></i> تكامل سحابي لحظي ومطابقة محاسبية 100%
+          </div>
+        </div>
+      </div>
+    </section>
+
   </div>
 
   <script>
     const API_BASE = '/api';
+    let currentEstDue = 0;
 
     async function loadERP() {
       try {
-        const [clRes, jRes, tbRes] = await Promise.all([
+        const [clRes, jRes, tbRes, estRes] = await Promise.all([
           fetch(`${API_BASE}/claims`),
           fetch(`${API_BASE}/accounting/journal-entries`),
-          fetch(`${API_BASE}/accounting/trial-balance`)
+          fetch(`${API_BASE}/accounting/trial-balance`),
+          fetch(`${API_BASE}/establishment`)
         ]);
 
         const cl = await clRes.json();
         const j = await jRes.json();
         const tb = await tbRes.json();
+        const estData = await estRes.json();
+
+        // تحديث بيانات التبويب الثالث (سند القبض المالي)
+        if (estData.success && estData.establishment) {
+          const est = estData.establishment;
+          currentEstDue = Number(est.totalDue) || 0;
+          const nameEl = document.getElementById('rec-est-display');
+          const dueEl = document.getElementById('rec-due-display');
+          const amtInput = document.getElementById('rec-amount-input');
+          if (nameEl) nameEl.textContent = `${est.name} (${est.regNo})`;
+          if (dueEl) dueEl.textContent = `${currentEstDue.toLocaleString()} ر.ي`;
+          if (amtInput && !amtInput.value && currentEstDue > 0) {
+            amtInput.value = currentEstDue;
+          }
+        }
 
         // 1. جدول الطلبات
         const cBody = document.getElementById('erp-claims-body');
@@ -216,13 +310,47 @@
       }
     }
 
+    async function submitFinancialReceipt() {
+      const amount = Number(document.getElementById('rec-amount-input').value);
+      const method = document.getElementById('rec-method-select').value;
+      const receiptNo = document.getElementById('rec-ref-input').value.trim() || `REC-${Date.now().toString().slice(-5)}`;
+
+      if (!amount || amount <= 0) {
+        alert('يرجى كتابة مبلغ صحيح لسند القبض');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/accounting/receive-payment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ receiptNo, amount, method })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`✅ ${data.message}\n\nرقم السند: ${receiptNo}\nالمبلغ المقبوض: ${amount.toLocaleString()} ر.ي`);
+          document.getElementById('rec-amount-input').value = '';
+          await loadERP();
+          switchTab('ledger'); // الانتقال لدفتر اليومية لمشاهدة القيد المولد فوراً
+        } else {
+          alert(data.error || 'حدث خطأ أثناء ترحيل السند');
+        }
+      } catch (e) {
+        alert('فشل الاتصال بالسيرفر');
+      }
+    }
+
     function switchTab(tab) {
-      ['claims', 'ledger'].forEach(t => {
-        document.getElementById(`erp-sec-${t}`).classList.add('hidden');
-        document.getElementById(`tab-btn-${t}`).className = 'pb-3 text-slate-400 hover:text-white font-medium';
+      ['claims', 'ledger', 'receipt'].forEach(t => {
+        const sec = document.getElementById(`erp-sec-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (sec) sec.classList.add('hidden');
+        if (btn) btn.className = 'pb-3 text-slate-400 hover:text-white font-medium';
       });
-      document.getElementById(`erp-sec-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-btn-${tab}`).className = 'pb-3 text-sky-400 border-b-2 border-sky-500 font-black';
+      const activeSec = document.getElementById(`erp-sec-${tab}`);
+      const activeBtn = document.getElementById(`tab-btn-${tab}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      if (activeBtn) activeBtn.className = 'pb-3 text-sky-400 border-b-2 border-sky-500 font-black';
     }
 
     async function resetSystemData() {
